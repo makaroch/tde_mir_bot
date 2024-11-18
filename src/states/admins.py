@@ -14,3 +14,6 @@ class AdminRefactorAboutText(StatesGroup):
 
 class AdminRefactorUsername(StatesGroup):
     start = State()
+
+class AdminSpam(StatesGroup):
+    start = State()

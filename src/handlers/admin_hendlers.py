@@ -7,12 +7,15 @@ from aiogram.fsm.context import FSMContext
 
 from src.filters.chat_types import ChatTypesFilter
 from src.filters.is_admin import IsAdmin
-from src.states.admins import AdminAddExl, AdminRefactorHelloText, AdminRefactorAboutText, AdminRefactorUsername
+from src.states.admins import AdminAddExl, AdminRefactorHelloText, AdminRefactorAboutText, AdminRefactorUsername, \
+    AdminSpam
 from src.settings import FILE_SAVE_PATH, TEXT_HELLO_MESSAGE, TEXT_ABOUT_MESSAGE, BUY_URL
 from src.services.load_product import load_iphone_from_xlsx
+from src.services.spam import spamming_user
 
 admin_private_router = Router()
 admin_private_router.message.filter(ChatTypesFilter(["private"]), IsAdmin())
+
 
 # /load_product_from_xlsx
 # /new_hello_message
@@ -147,3 +150,31 @@ async def new_manager_username(message: Message, state: FSMContext):
 @admin_private_router.message(AdminRefactorUsername.start)
 async def new_manager_username(message: Message, state: FSMContext):
     await message.answer("Ожидается новый username менеджера без @")
+
+
+@admin_private_router.message(StateFilter(None), Command("new_newsletter"))
+async def new_manager_username(message: Message, state: FSMContext):
+    await message.answer("Отправь мне сообщение которое нужно разослать всем клиентам!\n"
+                         "После начала рассылки её уже не отменить\n"
+                         "Используй команду /cancel чтобы отменить начало рассылки")
+    await state.set_state(AdminSpam.start)
+
+
+@admin_private_router.message(AdminSpam.start, Command("cancel"))
+async def new_manager_username(message: Message, state: FSMContext):
+    await message.answer("Отменено")
+    await state.clear()
+
+
+@admin_private_router.message(AdminSpam.start, F.text)
+async def new_manager_username(message: Message, state: FSMContext, bot: Bot):
+    await message.answer("Начал рассылку...")
+    await state.clear()
+    await spamming_user(message_text=message.text, bot=bot)
+    await message.answer("Закончил рассылку!")
+
+
+@admin_private_router.message(AdminSpam.start)
+async def new_manager_username(message: Message):
+    await message.answer("Ожидается ТЕКСТ сообщения для рассылки\n"
+                         "Используй команду /cancel чтобы отменить начало рассылки")

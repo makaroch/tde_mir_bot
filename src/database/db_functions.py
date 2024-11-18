@@ -16,9 +16,19 @@ class DbWorker:
     def create_new_user_if_not_exists(self, tg_user_id: int, username: str):
         with Session(autoflush=False, bind=self.__engine) as db:
             user = db.query(Client).filter(Client.tg_user_id == tg_user_id).first()
-            if not user:
+            if user and not user.is_subscription:
+                user.is_subscription = True
+                db.commit()
+            elif not user:
                 new_user = Client(tg_user_id=tg_user_id, username=username)
                 db.add(new_user)
+                db.commit()
+
+    def unsubscribe_user(self, tg_user_id: int):
+        with Session(autoflush=False, bind=self.__engine) as db:
+            user = db.query(Client).filter(Client.tg_user_id == tg_user_id).first()
+            if user:
+                user.is_subscription = False
                 db.commit()
 
     def get_all_type_product(self):
@@ -119,6 +129,15 @@ class DbWorker:
                 )
             db.add(product)
             db.commit()
+
+    def get_all_signed_users(self):
+        with Session(autoflush=False, bind=self.__engine) as db:
+            q = (
+                select(Client)
+                .select_from(Client)
+                .where(Client.is_subscription == True)
+            )
+            return db.execute(q).scalars().all()
 
 
 DB = DbWorker(engine=engine)

@@ -1,6 +1,6 @@
 from aiogram import Router, F
-from aiogram.filters import CommandStart, Command
-from aiogram.types import Message, CallbackQuery
+from aiogram.filters import CommandStart, Command, ChatMemberUpdatedFilter, KICKED
+from aiogram.types import Message, CallbackQuery, ChatMemberUpdated
 
 from src.filters.chat_types import ChatTypesFilter
 from src.keyboards.repl_keyboards import create_keyboard_type_product, create_keyboard_manufacturer, \
@@ -30,6 +30,11 @@ async def command_start_handler(message: Message) -> None:
     )
 
 
+@user_private_router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=KICKED))
+async def user_blocked_bot(event: ChatMemberUpdated):
+    DB.unsubscribe_user(event.chat.id)
+
+
 @user_private_router.message(Command("about"))
 async def echo_handler(message: Message) -> None:
     await message.answer(TEXT_ABOUT_MESSAGE[0])
@@ -38,17 +43,17 @@ async def echo_handler(message: Message) -> None:
 @user_private_router.message(F.text == "Как купить")
 async def keyboard_reaction(message: Message):
     await message.answer(
-"""Чтобы осуществить покупку: 
-
-1. Нажмите в каталоге кнопку «Купить». 
-2. Напишите нашему менеджеру в чат, что хотите приобрести.
-3. Договоритесь о визите в магазин или доставке.
-
-Доставка по Москве осуществляется БЕСПЛАТНО! 
-
-✅У нас только оригинальная продукция. 
-✅Любые проверки перед покупкой. 
-✅Trade-in ваших старых девайсов.""")
+        """Чтобы осуществить покупку: 
+        
+        1. Нажмите в каталоге кнопку «Купить». 
+        2. Напишите нашему менеджеру в чат, что хотите приобрести.
+        3. Договоритесь о визите в магазин или доставке.
+        
+        Доставка по Москве осуществляется БЕСПЛАТНО! 
+        
+        ✅У нас только оригинальная продукция. 
+        ✅Любые проверки перед покупкой. 
+        ✅Trade-in ваших старых девайсов.""")
 
 
 @user_private_router.message(F.text == "Связаться с нами")
@@ -82,7 +87,6 @@ async def echo_handler(call: CallbackQuery) -> None:
 
 @user_private_router.callback_query(F.data.startswith("manuf"))
 async def echo_handler(call: CallbackQuery) -> None:
-    # manufacturer_1_яблоки_1_phone m_id m_name type_id type_name
     temp_lst = call.data.split("|")
     m_id, type_id, type_name = temp_lst[1], temp_lst[2], temp_lst[3]
     await call.answer()
