@@ -63,16 +63,15 @@ async def keyboard_reaction(message: Message):
 async def echo_handler(call: CallbackQuery) -> None:
     await call.message.delete()
     await call.message.answer(
-        text=f"Здравствуйте{', ' + call.message.chat.first_name if call.message.chat.first_name else ''}!\n"
-             f"Выберите категорию: ",
+        text=f"Выберите категорию: ",
         reply_markup=create_keyboard_type_product()
     )
 
 
-@user_private_router.callback_query(F.data.startswith("type_product_"))
+@user_private_router.callback_query(F.data.startswith("type_pr"))
 async def echo_handler(call: CallbackQuery) -> None:
-    temp_lst = call.data.split("_")
-    type_id, type_name = temp_lst[2], temp_lst[3]
+    temp_lst = call.data.split("|")
+    type_id, type_name = temp_lst[1], temp_lst[2]
     await call.answer()
     await call.message.delete()
     await call.message.answer(
@@ -81,33 +80,29 @@ async def echo_handler(call: CallbackQuery) -> None:
     )
 
 
-@user_private_router.callback_query(F.data.startswith("manufacturer_"))
+@user_private_router.callback_query(F.data.startswith("manuf"))
 async def echo_handler(call: CallbackQuery) -> None:
     # manufacturer_1_яблоки_1_phone m_id m_name type_id type_name
-    temp_lst = call.data.split("_")
-    m_id, m_name, type_id, type_name = temp_lst[1], temp_lst[2], temp_lst[3], temp_lst[4]
+    temp_lst = call.data.split("|")
+    m_id, type_id, type_name = temp_lst[1], temp_lst[2], temp_lst[3]
     await call.answer()
     await call.message.delete()
     await call.message.answer(
-        text=f"Категория <b>{type_name}</b>\n"
-             f"Производитель <b>{m_name}</b>",
-        reply_markup=create_keyboard_subtype(m_id, m_name, type_id, type_name)
+        text=f"Категория <b>{type_name}</b>\n",
+        reply_markup=create_keyboard_subtype(m_id, type_id, type_name)
     )
 
 
-@user_private_router.callback_query(F.data.startswith("subtypes_"))
+@user_private_router.callback_query(F.data.startswith("subt"))
 async def echo_handler(call: CallbackQuery) -> None:
-    temp_lst = call.data.split("_")
-    subtypes_id, subtypes_name, m_id, m_name, type_id, type_name = temp_lst[1], temp_lst[2], temp_lst[3], temp_lst[4], \
-        temp_lst[5], temp_lst[6]
+    temp_lst = call.data.split("|")
+    subtypes_id, m_id, type_id, type_name = temp_lst[1], temp_lst[2], temp_lst[3], temp_lst[4]
     await call.answer()
     await call.message.delete()
     await call.message.answer(
         text=f"Категория <b>{type_name}</b>\n"
-             f"Производитель <b>{m_name}</b>\n"
-             f"Подкатегория <b>{subtypes_name}</b>\n\n"
              f"{get_str_all_product_by_subtypes_id(int(subtypes_id))}",
-        reply_markup=final_keyboard(m_id, m_name, type_id, type_name)
+        reply_markup=final_keyboard(m_id, type_id, type_name)
     )
 
 
