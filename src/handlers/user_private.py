@@ -3,8 +3,8 @@ from aiogram.filters import CommandStart, Command, ChatMemberUpdatedFilter, KICK
 from aiogram.types import Message, CallbackQuery, ChatMemberUpdated
 
 from src.filters.chat_types import ChatTypesFilter
-from src.keyboards.repl_keyboards import create_keyboard_type_product, create_keyboard_manufacturer, \
-    create_keyboard_subtype, final_keyboard, create_start_keyboard, kupit_knopka
+from src.keyboards.repl_keyboards import create_keyboard_type_product, final_keyboard, create_start_keyboard, \
+    kupit_knopka, create_keyboard_product
 from src.database.db_functions import DB
 from src.settings import TEXT_HELLO_MESSAGE, TEXT_ABOUT_MESSAGE
 
@@ -43,17 +43,17 @@ async def echo_handler(message: Message) -> None:
 @user_private_router.message(F.text == "Как купить")
 async def keyboard_reaction(message: Message):
     await message.answer(
-"""Чтобы осуществить покупку: 
-
-1. Нажмите в каталоге кнопку «Купить». 
-2. Напишите нашему менеджеру в чат, что хотите приобрести.
-3. Договоритесь о визите в магазин или доставке.
-
-Доставка по Москве осуществляется БЕСПЛАТНО! 
-
-✅У нас только оригинальная продукция. 
-✅Любые проверки перед покупкой. 
-✅Trade-in ваших старых девайсов.""")
+        """Чтобы осуществить покупку: 
+        
+        1. Нажмите в каталоге кнопку «Купить». 
+        2. Напишите нашему менеджеру в чат, что хотите приобрести.
+        3. Договоритесь о визите в магазин или доставке.
+        
+        Доставка по Москве осуществляется БЕСПЛАТНО! 
+        
+        ✅У нас только оригинальная продукция. 
+        ✅Любые проверки перед покупкой. 
+        ✅Trade-in ваших старых девайсов.""")
 
 
 @user_private_router.message(F.text == "Связаться с нами")
@@ -81,38 +81,22 @@ async def echo_handler(call: CallbackQuery) -> None:
     await call.message.delete()
     await call.message.answer(
         text=f"Категория <b>{type_name}</b>",
-        reply_markup=create_keyboard_manufacturer(type_id, type_name)
+        reply_markup=create_keyboard_product(int(type_id), type_name)
     )
 
 
-@user_private_router.callback_query(F.data.startswith("manuf"))
+@user_private_router.callback_query(F.data.startswith("product"))
 async def echo_handler(call: CallbackQuery) -> None:
     temp_lst = call.data.split("|")
-    m_id, type_id, type_name = temp_lst[1], temp_lst[2], temp_lst[3]
+    product_id, products_type_id, product_type_name = temp_lst[1], temp_lst[2], temp_lst[3]
     await call.answer()
     await call.message.delete()
     await call.message.answer(
-        text=f"Категория <b>{type_name}</b>\n",
-        reply_markup=create_keyboard_subtype(m_id, type_id, type_name)
+        text=get_str_products_by_type_id(int(product_id)),
+        reply_markup=final_keyboard(products_type_id, product_type_name)
     )
 
 
-@user_private_router.callback_query(F.data.startswith("subt"))
-async def echo_handler(call: CallbackQuery) -> None:
-    temp_lst = call.data.split("|")
-    subtypes_id, m_id, type_id, type_name = temp_lst[1], temp_lst[2], temp_lst[3], temp_lst[4]
-    await call.answer()
-    await call.message.delete()
-    await call.message.answer(
-        text=f"Категория <b>{type_name}</b>\n"
-             f"{get_str_all_product_by_subtypes_id(int(subtypes_id))}",
-        reply_markup=final_keyboard(m_id, type_id, type_name)
-    )
-
-
-def get_str_all_product_by_subtypes_id(subtypes_id: int) -> str:
-    products = DB.get_all_product_by_subtypes_id(subtypes_id)
-    result = ""
-    for product in products:
-        result += f"* {product.name} - {product.price}\n\n"
-    return result
+def get_str_products_by_type_id(product_id: int) -> str:
+    product = DB.get_product_by_id(product_id)
+    return product.description

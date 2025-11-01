@@ -17,7 +17,7 @@ class Client(models.Model):
 
 
 class ProductType(models.Model):
-    name = models.CharField(max_length=255, verbose_name="Название типа товара")
+    name = models.CharField(max_length=255, verbose_name="Название типа товара(что будет написано на кнопке)")
 
     class Meta:
         db_table = "products_types"
@@ -25,40 +25,14 @@ class ProductType(models.Model):
         verbose_name_plural = "Типы продукта"
 
     def __str__(self):
-        return f"Тип продукта: {self.name}"
+        return f"{self.name}"
 
-
-class ManufacturerCompany(models.Model):
-    name = models.CharField(max_length=255, verbose_name="Название фирмы товара")
-
-    class Meta:
-        db_table = "manufacturer_companies"
-        verbose_name = "Фирма производитель"
-        verbose_name_plural = "Фирмы производитель"
-
-    def __str__(self):
-        return f"Фирма производитель: {self.name}"
-
-
-class Subtype(models.Model):
-    name = models.CharField(max_length=255, verbose_name="Название подтипа")
-    products_type = models.ForeignKey(to=ProductType, on_delete=models.PROTECT, verbose_name="Тип продукта")
-    manufacturer_company = models.ForeignKey(to=ManufacturerCompany, on_delete=models.PROTECT,
-                                             verbose_name="Фирма производитель")
-
-    def __str__(self):
-        return f"Подтип: {self.name}"
-
-    class Meta:
-        db_table = "Subtype"
-        verbose_name = "Подтип"
-        verbose_name_plural = "Подтипы"
 
 class Product(models.Model):
     name = models.CharField(max_length=255, verbose_name="Название товара")
-    price = models.IntegerField(verbose_name="Цена")
+    description = models.TextField(verbose_name="Описание товара(Что выведется при нажатии)", default="Позже появится")
     quantity = models.IntegerField(default=1, verbose_name="Кол-во в наличи")
-    subtype = models.ForeignKey(to=Subtype, on_delete=models.PROTECT, verbose_name="Подтип")
+    subtype = models.ForeignKey(to=ProductType, on_delete=models.PROTECT, verbose_name="Тип продукта")
 
     class Meta:
         db_table = "Product"

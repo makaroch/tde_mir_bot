@@ -5,7 +5,7 @@ services:
     image: postgres:15
     container_name: postgres_db
     volumes:
-      - ~/.pg/pg_data/root:/var/lib/postgresql/data
+      - ~/.pg/pg_data/root_new:/var/lib/postgresql/data
     env_file:
       - .env
   django_prod:
@@ -35,7 +35,7 @@ services:
     depends_on:
       - django_prod
     ports:
-      - "${NGINX_EXTERNAL_PORT}:80"
+      - "80:80"
   bot:
     build:
       dockerfile: ./Dockerfile

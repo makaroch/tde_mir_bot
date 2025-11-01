@@ -23,37 +23,6 @@ admin_private_router.message.filter(ChatTypesFilter(["private"]), IsAdmin())
 # /new_manager_username
 
 
-@admin_private_router.message(StateFilter(None), Command("load_product_from_xlsx"))
-async def new_xml_file(message: Message, state: FSMContext):
-    await message.answer("Отправьте новый эксель файл")
-    await state.set_state(AdminAddExl.start)
-
-
-@admin_private_router.message(AdminAddExl.start, F.document)
-async def new_xml_file(message: Message, state: FSMContext, bot: Bot):
-    path_save_file = f"{FILE_SAVE_PATH}/{message.document.file_name}"
-    await message.answer("Ожидайте...")
-
-    await bot.download(
-        file=message.document,
-        destination=path_save_file
-    )
-    load_iphone_from_xlsx(path_save_file, message)
-    os.remove(path_save_file)
-    await state.clear()
-    await message.answer("Записал новые товары")
-
-
-@admin_private_router.message(AdminAddExl.start, F.text.lower() == "отмена")
-async def new_xml_file(message: Message, state: FSMContext):
-    await message.answer("Отменил ожидания нового файла нового файла")
-    await state.clear()
-
-
-@admin_private_router.message(AdminAddExl.start)
-async def new_xml_file(message: Message, state: FSMContext):
-    await message.answer("Ожидаются только эксель файлы. Попробуйте еще раз или введите 'Отмена'")
-
 
 @admin_private_router.message(StateFilter(None), Command("new_hello_message"))
 async def new_hello_text(message: Message, state: FSMContext):

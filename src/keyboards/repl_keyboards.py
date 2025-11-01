@@ -16,30 +16,64 @@ def create_start_keyboard():
 
 def create_keyboard_type_product():
     all_type_product = DB.get_all_type_product()
-
     keyboard = InlineKeyboardBuilder()
-    for type_product in all_type_product:
+
+    if len(all_type_product) % 2 == 0:
+        len_range = len(all_type_product)
+    else:
+        len_range = len(all_type_product) - 1
+
+    for i in range(0, len_range, 2):
         keyboard.row(
             InlineKeyboardButton(
-                text=type_product.name,
-                callback_data=f"type_pr|{type_product.id}|{type_product.name}"
+                text=all_type_product[i].name,
+                callback_data=f"type_pr|{all_type_product[i].id}|{all_type_product[i].name}"
+            ),
+            InlineKeyboardButton(
+                text=all_type_product[i + 1].name,
+                callback_data=f"type_pr|{all_type_product[i + 1].id}|{all_type_product[i + 1].name}"
+            )
+        )
+
+    if len(all_type_product) % 2 != 0:
+        keyboard.row(
+            InlineKeyboardButton(
+                text=all_type_product[-1].name,
+                callback_data=f"type_pr|{all_type_product[-1].id}|{all_type_product[-1].name}"
             )
         )
 
     return keyboard.as_markup()
 
 
-def create_keyboard_manufacturer(products_type_id, products_type_name):
-    manufacturer = DB.get_manufacturer_by_type_product(products_type_id)
-
+def create_keyboard_product(products_type_id, product_type_name):
+    products = DB.get_products_by_type_product(products_type_id)
     keyboard = InlineKeyboardBuilder()
-    for m in manufacturer:
+    if len(products) % 2 == 0:
+        len_range = len(products)
+    else:
+        len_range = len(products) - 1
+
+    for i in range(0, len_range, 2):
         keyboard.row(
             InlineKeyboardButton(
-                text=m.name,
-                callback_data=f"manuf|{m.id}|{products_type_id}|{products_type_name}"
+                text=products[i].name,
+                callback_data=f"product|{products[i].id}|{products_type_id}|{product_type_name}"  # manuf
+            ),
+            InlineKeyboardButton(
+                text=products[i + 1].name,
+                callback_data=f"product|{products[i + 1].id}|{products_type_id}|{product_type_name}"  # manuf
             )
         )
+
+    if len(products) % 2 != 0:
+        keyboard.row(
+            InlineKeyboardButton(
+                text=products[-1].name,
+                callback_data=f"product|{products[-1].id}|{products_type_id}|{product_type_name}"  # manuf
+            )
+        )
+
     keyboard.row(
         InlineKeyboardButton(
             text='<- Назад',
@@ -69,7 +103,7 @@ def create_keyboard_subtype(m_id, type_id, type_name):
     return keyboard.as_markup()
 
 
-def final_keyboard(m_id, products_type_id, products_type_name, ):
+def final_keyboard(type_product_id, type_product_name):
     keyboard = InlineKeyboardBuilder()
     keyboard.row(
         InlineKeyboardButton(
@@ -80,7 +114,7 @@ def final_keyboard(m_id, products_type_id, products_type_name, ):
     keyboard.row(
         InlineKeyboardButton(
             text='<- Назад',
-            callback_data=f"manuf|{m_id}|{products_type_id}|{products_type_name}"
+            callback_data=f"type_pr|{type_product_id}|{type_product_name}"
         )
     )
     return keyboard.as_markup()
