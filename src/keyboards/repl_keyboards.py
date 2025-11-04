@@ -125,7 +125,7 @@ def kupit_knopka():
     keyboard = InlineKeyboardBuilder()
     keyboard.row(
         InlineKeyboardButton(
-            text="❓задать вопрос",
+            text="написать",
             url=f"https://t.me/{BUY_URL[0]}"
         )
     )

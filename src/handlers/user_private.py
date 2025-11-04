@@ -6,7 +6,7 @@ from src.filters.chat_types import ChatTypesFilter
 from src.keyboards.repl_keyboards import create_keyboard_type_product, final_keyboard, create_start_keyboard, \
     kupit_knopka, create_keyboard_product
 from src.database.db_functions import DB
-from src.settings import TEXT_HELLO_MESSAGE, TEXT_ABOUT_MESSAGE
+from src.settings import TEXT_HELLO_MESSAGE, TEXT_ABOUT_MESSAGE, TEXT_HOW_BUY, TEXT_CONTACT_US
 
 user_private_router = Router()
 user_private_router.message.filter(ChatTypesFilter(["private"]))
@@ -43,23 +43,14 @@ async def echo_handler(message: Message) -> None:
 @user_private_router.message(F.text == "Как купить")
 async def keyboard_reaction(message: Message):
     await message.answer(
-        """Чтобы осуществить покупку: 
-        
-        1. Нажмите в каталоге кнопку «Купить». 
-        2. Напишите нашему менеджеру в чат, что хотите приобрести.
-        3. Договоритесь о визите в магазин или доставке.
-        
-        Доставка по Москве осуществляется БЕСПЛАТНО! 
-        
-        ✅У нас только оригинальная продукция. 
-        ✅Любые проверки перед покупкой. 
-        ✅Trade-in ваших старых девайсов.""")
+        text=TEXT_HOW_BUY[0],
+    )
 
 
 @user_private_router.message(F.text == "Связаться с нами")
 async def keyboard_reaction(message: Message):
     await message.answer(
-        text="Напишите менеджеру",
+        text=TEXT_CONTACT_US[0],
         reply_markup=kupit_knopka()
     )
 

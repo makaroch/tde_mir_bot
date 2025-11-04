@@ -8,8 +8,8 @@ from aiogram.fsm.context import FSMContext
 from src.filters.chat_types import ChatTypesFilter
 from src.filters.is_admin import IsAdmin
 from src.states.admins import AdminAddExl, AdminRefactorHelloText, AdminRefactorAboutText, AdminRefactorUsername, \
-    AdminSpam
-from src.settings import FILE_SAVE_PATH, TEXT_HELLO_MESSAGE, TEXT_ABOUT_MESSAGE, BUY_URL
+    AdminSpam, AdminHowBuyText, AdminContactUs
+from src.settings import FILE_SAVE_PATH, TEXT_HELLO_MESSAGE, TEXT_ABOUT_MESSAGE, BUY_URL, TEXT_HOW_BUY, TEXT_CONTACT_US
 from src.services.load_product import load_iphone_from_xlsx
 from src.services.spam import spamming_user
 
@@ -21,7 +21,6 @@ admin_private_router.message.filter(ChatTypesFilter(["private"]), IsAdmin())
 # /new_hello_message
 # /new_about_message
 # /new_manager_username
-
 
 
 @admin_private_router.message(StateFilter(None), Command("new_hello_message"))
@@ -147,3 +146,55 @@ async def new_manager_username(message: Message, state: FSMContext, bot: Bot):
 async def new_manager_username(message: Message):
     await message.answer("Ожидается ТЕКСТ сообщения для рассылки\n"
                          "Используй команду /cancel чтобы отменить начало рассылки")
+
+
+@admin_private_router.message(StateFilter(None), Command("new_how_buy_text"))
+async def new_manager_username(message: Message, state: FSMContext):
+    await message.answer("Отправь мне текст нового сообщения для кнопки 'Как купить'\n"
+                         "Используй команду /cancel чтобы отменить ожидание")
+    await state.set_state(AdminHowBuyText.start)
+
+
+@admin_private_router.message(AdminHowBuyText.start, Command("cancel"))
+async def new_manager_username(message: Message, state: FSMContext):
+    await message.answer("Отменено")
+    await state.clear()
+
+
+@admin_private_router.message(AdminHowBuyText.start, F.text)
+async def new_manager_username(message: Message, state: FSMContext, bot: Bot):
+    await state.clear()
+    TEXT_HOW_BUY[0] = message.text
+    await message.answer("Изменено")
+
+
+@admin_private_router.message(AdminHowBuyText.start)
+async def new_manager_username(message: Message):
+    await message.answer("Ожидается ТЕКСТ сообщения кнопки 'Как купить'\n"
+                         "Используй команду /cancel чтобы отменить ожидание")
+
+
+@admin_private_router.message(StateFilter(None), Command("new_contact_text"))
+async def new_manager_username(message: Message, state: FSMContext):
+    await message.answer("Отправь мне текст нового сообщения для кнопки 'Связаться с нами'\n"
+                         "Используй команду /cancel чтобы отменить ожидание")
+    await state.set_state(AdminContactUs.start)
+
+
+@admin_private_router.message(AdminContactUs.start, Command("cancel"))
+async def new_manager_username(message: Message, state: FSMContext):
+    await message.answer("Отменено")
+    await state.clear()
+
+
+@admin_private_router.message(AdminContactUs.start, F.text)
+async def new_manager_username(message: Message, state: FSMContext, bot: Bot):
+    await state.clear()
+    TEXT_CONTACT_US[0] = message.text
+    await message.answer("Изменено")
+
+
+@admin_private_router.message(AdminContactUs.start)
+async def new_manager_username(message: Message):
+    await message.answer("Ожидается ТЕКСТ сообщения кнопки 'Связаться с нами'\n"
+                         "Используй команду /cancel чтобы отменить ожидание")
