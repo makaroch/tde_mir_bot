@@ -1,5 +1,3 @@
-import os
-
 from aiogram import Router, F, Bot
 from aiogram.filters import Command, StateFilter
 from aiogram.types import Message
@@ -10,7 +8,6 @@ from src.filters.is_admin import IsAdmin
 from src.states.admins import AdminAddExl, AdminRefactorHelloText, AdminRefactorAboutText, AdminRefactorUsername, \
     AdminSpam, AdminHowBuyText, AdminContactUs
 from src.settings import FILE_SAVE_PATH, TEXT_HELLO_MESSAGE, TEXT_ABOUT_MESSAGE, BUY_URL, TEXT_HOW_BUY, TEXT_CONTACT_US
-from src.services.load_product import load_iphone_from_xlsx
 from src.services.spam import spamming_user
 
 admin_private_router = Router()

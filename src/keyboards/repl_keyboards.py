@@ -8,8 +8,8 @@ from src.settings import BUY_URL
 def create_start_keyboard():
     m = ReplyKeyboardBuilder()
     m.row(
-        KeyboardButton(text="Как купить"),
-        KeyboardButton(text="Связаться с нами"),
+        KeyboardButton(text="Каталог"),
+        KeyboardButton(text="Контакты"),
     )
     return m.as_markup(resize_keyboard=True)
 

@@ -12,8 +12,7 @@ user_private_router = Router()
 user_private_router.message.filter(ChatTypesFilter(["private"]))
 
 
-@user_private_router.message(CommandStart())
-async def command_start_handler(message: Message) -> None:
+async def start_command_logik(message: Message):
     DB.create_new_user_if_not_exists(
         tg_user_id=message.from_user.id,
         username=str(message.from_user.username),
@@ -30,6 +29,11 @@ async def command_start_handler(message: Message) -> None:
     )
 
 
+@user_private_router.message(CommandStart())
+async def command_start_handler(message: Message) -> None:
+    await start_command_logik(message)
+
+
 @user_private_router.my_chat_member(ChatMemberUpdatedFilter(member_status_changed=KICKED))
 async def user_blocked_bot(event: ChatMemberUpdated):
     DB.unsubscribe_user(event.chat.id)
@@ -40,17 +44,15 @@ async def echo_handler(message: Message) -> None:
     await message.answer(TEXT_ABOUT_MESSAGE[0])
 
 
-@user_private_router.message(F.text == "Как купить")
+@user_private_router.message(F.text == "Каталог")
 async def keyboard_reaction(message: Message):
-    await message.answer(
-        text=TEXT_HOW_BUY[0],
-    )
+    await start_command_logik(message)
 
 
-@user_private_router.message(F.text == "Связаться с нами")
+@user_private_router.message(F.text == "Контакты")
 async def keyboard_reaction(message: Message):
     await message.answer(
-        text=TEXT_CONTACT_US[0],
+        text=TEXT_ABOUT_MESSAGE[0],
         reply_markup=kupit_knopka()
     )
 
