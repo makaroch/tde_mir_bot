@@ -86,7 +86,8 @@ async def echo_handler(call: CallbackQuery) -> None:
     await call.message.delete()
     await call.message.answer(
         text=get_str_products_by_type_id(int(product_id)),
-        reply_markup=final_keyboard(products_type_id, product_type_name)
+        reply_markup=final_keyboard(products_type_id, product_type_name),
+        protect_content=True
     )
 
 
