@@ -4,13 +4,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-TG_BOT_TOKEN = getenv("TG_BOT_TOKEN")
+TG_BOT_TOKEN = getenv("TG_BOT_TOKEN", None)
 
-POSTGRES_DB = getenv("POSTGRES_DB")
-POSTGRES_USER = getenv("POSTGRES_USER")
-POSTGRES_PASSWORD = getenv("POSTGRES_PASSWORD")
-POSTGRES_HOST = getenv("POSTGRES_HOST")
-POSTGRES_PORT = getenv("POSTGRES_PORT")
+POSTGRES_DB = getenv("POSTGRES_DB", None)
+POSTGRES_USER = getenv("POSTGRES_USER", None)
+POSTGRES_PASSWORD = getenv("POSTGRES_PASSWORD", None)
+POSTGRES_HOST = getenv("POSTGRES_HOST", None)
+POSTGRES_PORT = getenv("POSTGRES_PORT", None)
 
 BUY_URL = ["E_mir_store"]
 
@@ -35,3 +35,22 @@ TEXT_CONTACT_US = [
 📲 Напишите нам — ответим быстро!
     """
 ]
+if not all(
+        (
+                TG_BOT_TOKEN,
+                POSTGRES_DB,
+                POSTGRES_USER,
+                POSTGRES_PASSWORD,
+                POSTGRES_HOST,
+                POSTGRES_PORT,
+                BUY_URL,
+                FILE_SAVE_PATH,
+                TEXT_HELLO_MESSAGE,
+                TEXT_ABOUT_MESSAGE,
+                TEXT_HOW_BUY,
+                TEXT_CONTACT_US,
+        )
+):
+    raise Exception(
+        "Not all environment variables are set. Please set them manually."
+    )

@@ -1,4 +1,4 @@
-from aiogram import Router, F
+from aiogram import Router, F, types
 from aiogram.filters import CommandStart, Command, ChatMemberUpdatedFilter, KICKED
 from aiogram.types import Message, CallbackQuery, ChatMemberUpdated
 
@@ -23,6 +23,8 @@ async def start_command_logik(message: Message):
              f"{'\n' + TEXT_HELLO_MESSAGE[0] + '\n' if TEXT_HELLO_MESSAGE[0] else ''}\n",
         reply_markup=create_start_keyboard()
     )
+    video = types.FSInputFile("src/data/circle.mp4")
+    await message.answer_video_note(video)
     await message.answer(
         text=f"Выберите категорию: ",
         reply_markup=create_keyboard_type_product()
