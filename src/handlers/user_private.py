@@ -6,7 +6,7 @@ from src.filters.chat_types import ChatTypesFilter
 from src.keyboards.repl_keyboards import create_keyboard_type_product, final_keyboard, create_start_keyboard, \
     kupit_knopka, create_keyboard_product
 from src.database.db_functions import DB
-from src.settings import TEXT_HELLO_MESSAGE, TEXT_ABOUT_MESSAGE, TEXT_HOW_BUY, TEXT_CONTACT_US
+from src.settings import TEXT_HELLO_MESSAGE, TEXT_ABOUT_MESSAGE, TEXT_HOW_BUY, TEXT_CONTACT_US, TEXT_INFO_BUTTON
 
 user_private_router = Router()
 user_private_router.message.filter(ChatTypesFilter(["private"]))
@@ -68,6 +68,13 @@ async def echo_handler(call: CallbackQuery) -> None:
     await call.message.answer(
         text=f"Выберите категорию: ",
         reply_markup=create_keyboard_type_product()
+    )
+
+@user_private_router.callback_query(F.data.startswith("info"))
+async def echo_handler(call: CallbackQuery) -> None:
+    await call.message.delete()
+    await call.message.answer(
+        text=TEXT_INFO_BUTTON[0]
     )
 
 

@@ -43,6 +43,13 @@ def create_keyboard_type_product():
             )
         )
 
+    keyboard.row(
+        InlineKeyboardButton(
+            text="Информация",
+            callback_data=f"info"
+        )
+    )
+
     return keyboard.as_markup()
 
 

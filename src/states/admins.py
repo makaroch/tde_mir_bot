@@ -27,3 +27,7 @@ class AdminHowBuyText(StatesGroup):
 
 class AdminContactUs(StatesGroup):
     start = State()
+
+
+class AdminInfoBtn(StatesGroup):
+    start = State()

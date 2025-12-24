@@ -6,8 +6,9 @@ from aiogram.fsm.context import FSMContext
 from src.filters.chat_types import ChatTypesFilter
 from src.filters.is_admin import IsAdmin
 from src.states.admins import AdminAddExl, AdminRefactorHelloText, AdminRefactorAboutText, AdminRefactorUsername, \
-    AdminSpam, AdminHowBuyText, AdminContactUs
-from src.settings import FILE_SAVE_PATH, TEXT_HELLO_MESSAGE, TEXT_ABOUT_MESSAGE, BUY_URL, TEXT_HOW_BUY, TEXT_CONTACT_US
+    AdminSpam, AdminHowBuyText, AdminContactUs, AdminInfoBtn
+from src.settings import FILE_SAVE_PATH, TEXT_HELLO_MESSAGE, TEXT_ABOUT_MESSAGE, BUY_URL, TEXT_HOW_BUY, TEXT_CONTACT_US, \
+    TEXT_INFO_BUTTON
 from src.services.spam import spamming_user
 
 admin_private_router = Router()
@@ -194,4 +195,28 @@ async def new_manager_username(message: Message, state: FSMContext, bot: Bot):
 @admin_private_router.message(AdminContactUs.start)
 async def new_manager_username(message: Message):
     await message.answer("Ожидается ТЕКСТ сообщения кнопки 'Связаться с нами'\n"
+                         "Используй команду /cancel чтобы отменить ожидание")
+
+
+@admin_private_router.message(StateFilter(None), Command("new_info_btn_text"))
+async def new_manager_username(message: Message, state: FSMContext):
+    await message.answer("Отправь мне текст нового сообщения для кнопки 'Информация'\n"
+                         "Используй команду /cancel чтобы отменить ожидание")
+    await state.set_state(AdminInfoBtn.start)
+
+
+@admin_private_router.message(AdminInfoBtn.start, Command("cancel"))
+async def new_manager_username(message: Message, state: FSMContext):
+    await message.answer("Отменено")
+    await state.clear()
+
+@admin_private_router.message(AdminInfoBtn.start, F.text)
+async def new_manager_username(message: Message, state: FSMContext, bot: Bot):
+    await state.clear()
+    TEXT_INFO_BUTTON[0] = message.text
+    await message.answer("Изменено")
+
+@admin_private_router.message(AdminInfoBtn.start)
+async def new_manager_username(message: Message):
+    await message.answer("Ожидается ТЕКСТ сообщения кнопки 'Информация'\n"
                          "Используй команду /cancel чтобы отменить ожидание")
